@@ -5,17 +5,10 @@
     android:layout_height="match_parent"
     android:id="@+id/item_layout">
     <ImageView
-        android:layout_width="100dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#545454"
-        android:layout_weight="0.5"
         android:id="@+id/image1"
-        />
-    <ImageView
-        android:layout_width="100dp"
-        android:layout_height="match_parent"
-        android:background="#00AAAA"
-        android:layout_weight="0.5"
-        android:id="@+id/image2"
+        android:scaleType="fitXY"
         />
 </LinearLayout>

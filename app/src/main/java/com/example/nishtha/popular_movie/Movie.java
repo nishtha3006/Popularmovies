@@ -5,7 +5,7 @@ package com.example.nishtha.popular_movie;
  */
 public class Movie {
     String title,overview,image_url,release_date;
-    final String BASE_URL=" http://image.tmdb.org/t/p/w342/";
+    final String BASE_URL="http://image.tmdb.org/t/p/w342/";
     double ratings;
     String final_url;
 

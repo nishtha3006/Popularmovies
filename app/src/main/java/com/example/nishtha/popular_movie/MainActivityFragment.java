@@ -1,13 +1,21 @@
 package com.example.nishtha.popular_movie;
 
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,9 +31,10 @@ import java.util.ArrayList;
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
-    String LOG_TAG="com.example.nishtha.popular_movie";
+    String LOG_TAG="popular_movie";
     MoviesAdapter madapter;
-    ArrayList<Movies> movies;
+    ArrayList<Movie> movies;
+    String sort_type="popularity";
     public MainActivityFragment() {
     }
 
@@ -38,46 +47,84 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        updateMovie();
+        updateMovie(sort_type);
     }
-    private void updateMovie(){
-        PopulateMovie populateMovie=new PopulateMovie();
-        populateMovie.execute();
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager)getActivity().getSystemService(getContext().CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private void updateMovie(String sort_type){
+        if(isNetworkAvailable()) {
+            PopulateMovie populateMovie = new PopulateMovie();
+            populateMovie.execute(sort_type);
+        }else {
+            Toast.makeText(getContext(),"Connection failed",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.movie_fragment,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.sort_by_pop){
+            sort_type="popularity";
+            updateMovie(sort_type);
+            return  true;
+        }
+        if(item.getItemId()==R.id.sort_by_rate){
+            sort_type="vote_average";
+            updateMovie(sort_type);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         movies=new ArrayList<>();
-       /* movies.add(new Movies("http://image.tmdb.org/t/p/w342//24qz9HuZY8K3Cdo4hRWkmztT7gH.jpg",
-                "http://image.tmdb.org/t/p/w342//qmDpIHrmpJINaRKAfWQfftjCdyi.jpg"));
-        movies.add(new Movies("http://image.tmdb.org/t/p/w342//cezWGskPY5x7GaglTTRN4Fugfb8.jpg",
-                "http://image.tmdb.org/t/p/w342//1hRoyzDtpgMU7Dz4JF22RANzQO7.jpg"));
-        movies.add(new Movies("http://image.tmdb.org/t/p/w342//h1XjBJoWdOh8aegBoVYKgABQZSL.jpg",
-                "http://image.tmdb.org/t/p/w342//uVALAeLEMGMf3oYpvdVi4uuaNOo.jpg"));
-        movies.add(new Movies("http://image.tmdb.org/t/p/w342//s2IG9qXfhJYxIttKyroYFBsHwzQ.jpg",
-                "http://image.tmdb.org/t/p/w342//s2IG9qXfhJYxIttKyroYFBsHwzQ.jpg"));*/
-        madapter=new MoviesAdapter(getActivity(),R.layout.list_item,movies);
-        View rootView=inflater.inflate(R.layout.fragment_main, container, false);
-        ListView list=(ListView)rootView.findViewById(R.id.list);
-        list.setAdapter(madapter);
+        madapter = new MoviesAdapter(getActivity(), R.layout.list_item, new ArrayList<Movie>());
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        GridView gridView = (GridView) rootView.findViewById(R.id.grids);
+        gridView.setAdapter(madapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Movie movie_item = (Movie) parent.getItemAtPosition(position);
+                Intent i = new Intent(getContext(), Movie_Detail.class);
+                i.putExtra("name", movie_item.getTitle());
+                i.putExtra("url",movie_item.image_url);
+                i.putExtra("ratings",movie_item.getRatings());
+                i.putExtra("release_date",movie_item.getRelease_date());
+                i.putExtra("overview",movie_item.getOverview());
+                startActivity(i);
+            }
+        });
+        updateMovie(sort_type);
         return  rootView;
     }
 
-    public class PopulateMovie extends AsyncTask<String[],String,Movie[]> {
+    public class PopulateMovie extends AsyncTask<String,Void,Movie[]> {
         //http://api.themoviedb.org/3/discover/movie?sort_by=vote_count.desc&api_key=d22374f30dea5711f5ae946bed7189f6
         HttpURLConnection urlConnection;
         BufferedReader bufferedReader;
         String movies_detail=null;
         @Override
-        protected Movie[] doInBackground(String[]... params) {
+        protected Movie[] doInBackground(String... params) {
             final String BASE_URL="http://api.themoviedb.org/3";
             final String DISCOVER="/discover";
             final String BY_MOVIE="/movie";
+            final String SORT_BY="?sort_by="+params[0]+".desc";
             final String SORT_BY_POP="?sort_by=popularity.desc";
             final String SORT_BY_RATINGS="?sort_by=vote_average.desc";
             final String API_KEY="&api_key=d22374f30dea5711f5ae946bed7189f6";
-            String path=BASE_URL+DISCOVER+BY_MOVIE+SORT_BY_POP+API_KEY;
+            String path=BASE_URL+DISCOVER+BY_MOVIE+SORT_BY+API_KEY;
 
             try{
                 URL url=new URL(path);
@@ -145,14 +192,15 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected void onPostExecute(Movie[] all_movies) {
             if(all_movies!=null) {
-                for(int i=0;i<all_movies.length-1;i=i+2) {
-                    Movies temp=new Movies(all_movies[i],all_movies[i+1]);
-                    movies.add(temp);
+                movies.clear();
+                madapter.clear();
+                for(int i=0;i<all_movies.length;i++) {
+                    movies.add(all_movies[i]);
                 }
                 madapter.addAll(movies);
                 madapter.notifyDataSetChanged();
-
             }
         }
+
     }
 }
