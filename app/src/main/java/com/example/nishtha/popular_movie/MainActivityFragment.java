@@ -111,7 +111,7 @@ public class MainActivityFragment extends Fragment {
     }
 
     public class PopulateMovie extends AsyncTask<String,Void,Movie[]> {
-        //http://api.themoviedb.org/3/discover/movie?sort_by=vote_count.desc&api_key=d22374f30dea5711f5ae946bed7189f6
+        //http://api.themoviedb.org/3/discover/movie?sort_by=vote_count.desc&api_key=
         HttpURLConnection urlConnection;
         BufferedReader bufferedReader;
         String movies_detail=null;
@@ -123,7 +123,7 @@ public class MainActivityFragment extends Fragment {
             final String SORT_BY="?sort_by="+params[0]+".desc";
             final String SORT_BY_POP="?sort_by=popularity.desc";
             final String SORT_BY_RATINGS="?sort_by=vote_average.desc";
-            final String API_KEY="&api_key=d22374f30dea5711f5ae946bed7189f6";
+            final String API_KEY="&api_key=YOUR_API_KEY";
             String path=BASE_URL+DISCOVER+BY_MOVIE+SORT_BY+API_KEY;
 
             try{
