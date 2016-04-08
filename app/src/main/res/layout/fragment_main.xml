@@ -6,14 +6,13 @@
     android:id="@+id/list_layout"
     android:background="#00aaaa"
     android:layout_marginTop="16dp"
-    tools:context="com.example.nishtha.popular_movie.MainActivityFragment">
+    tools:context=".MoviesFragment">
     <GridView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/grids"
         android:numColumns="2"
         android:layout_marginTop="10dp"
-        android:fadeScrollbars="true"
-        >
+        android:fadeScrollbars="true">
     </GridView>
 </RelativeLayout>

@@ -9,6 +9,7 @@
         android:layout_height="match_parent"
         android:background="#545454"
         android:id="@+id/image1"
-        android:scaleType="fitXY"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
         />
 </LinearLayout>

@@ -12,6 +12,11 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <provider
+            android:authorities="com.example.nishtha.popular_movie"
+            android:name=".Data.MovieProvider"
+            android:enabled="true"
+            />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -26,6 +31,8 @@
             android:name=".Movie_Detail"
             android:label="@string/title_activity_movie__detail"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
     </application>
+
 
 </manifest>

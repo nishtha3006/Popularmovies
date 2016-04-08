@@ -1,13 +1,46 @@
 package com.example.nishtha.popular_movie;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by nishtha on 21/2/16.
  */
-public class Movie {
-    String title,overview,image_url,release_date;
+public class Movie implements Parcelable {
+    String title,overview,release_date;
+    public String image_url;
     final String BASE_URL="http://image.tmdb.org/t/p/w342/";
     double ratings;
     String final_url;
+    Movie(){
+
+    }
+    Movie(Parcel in){
+        String[] data=new String[4];
+        in.readStringArray(data);
+        this.title=data[0];
+        this.overview=data[1];
+        this.final_url=data[2];
+        this.release_date=data[3];
+        this.ratings=in.readDouble();
+    }
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeStringArray(new String[]{
+                this.title,this.overview,this.final_url,this.release_date
+        });
+        dest.writeDouble(new Double(this.ratings));
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 
     public String getTitle() {
         return title;
@@ -49,4 +82,11 @@ public class Movie {
     public void setRatings(double ratings) {
         this.ratings = ratings;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+
 }
