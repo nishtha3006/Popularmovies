@@ -3,7 +3,6 @@ package com.example.nishtha.popular_movie;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -14,7 +13,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
-            Log.d("hello","in the main activity");
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.main_layout, new MoviesFragment())
                     .commit();}

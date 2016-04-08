@@ -15,7 +15,6 @@ import android.util.Log;
  * Created by nishtha on 4/4/16.
  */
 public class MovieProvider extends ContentProvider{
-
     final static int MOVIE=100;
     final static int MOVIE_WITH_ID=101;
     final static int FAVOURITE=200;
@@ -28,9 +27,7 @@ public class MovieProvider extends ContentProvider{
         sqLiteQueryBuilderForFavourite=new SQLiteQueryBuilder();
         sqLiteQueryBuilderForMovie=new SQLiteQueryBuilder();
         sqLiteQueryBuilderForMovie.setTables(MovieContract.MovieEntry.TABLE_NAME);
-        Log.d("hello", "query builder for movie");
         sqLiteQueryBuilderForFavourite.setTables(MovieContract.Favourite.TABLE_NAME);
-        Log.d("hello", "query builder for favourite");
     }
     //movie.id=?
     private static final String queryMovieById=
@@ -51,7 +48,6 @@ public class MovieProvider extends ContentProvider{
         matcher.addURI(MovieContract.CONTENT_AUTHORITY,MovieContract.PATH_MOVIE+"/#",MOVIE_WITH_ID);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY,MovieContract.PATH_FAV,FAVOURITE);
         matcher.addURI(MovieContract.CONTENT_AUTHORITY,MovieContract.PATH_FAV+"/#",FAVOURITE_WITH_ID);
-        Log.d("hello","matcher has been created");
         return matcher;
     }
     @Nullable
@@ -59,10 +55,9 @@ public class MovieProvider extends ContentProvider{
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         final int match=matcher.match(uri);
         Cursor retCursor;
-        Log.d("hello","match is : "+ match +"in query");
+        Log.d("hello","match is : "+ match);
         switch (match){
             case MOVIE :
-                Log.d("hello","query movie without id");
                 retCursor = movieDbHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TABLE_NAME,
                         projection,
@@ -74,7 +69,6 @@ public class MovieProvider extends ContentProvider{
                 );
                 break;
             case FAVOURITE :
-                Log.d("hello","query favorite without id");
                 retCursor = movieDbHelper.getReadableDatabase().query(
                         MovieContract.Favourite.TABLE_NAME,
                         projection,
@@ -86,12 +80,10 @@ public class MovieProvider extends ContentProvider{
                 );
                 break;
             case MOVIE_WITH_ID : {
-                Log.d("hello","query movie with id");
                 retCursor=getMovieWithId(uri,projection,sortOrder);
                 break;
             }
             case FAVOURITE_WITH_ID : {
-                Log.d("hello","query movie  with id");
                 retCursor=getFavouriteById(uri,projection,sortOrder);
                 break;
             }
@@ -103,12 +95,12 @@ public class MovieProvider extends ContentProvider{
     }
 
     private Cursor getMovieWithId(Uri uri,String[] projection,String sortOrder){
-        String movie_id=MovieContract.MovieEntry.getMovieID(uri);
+        int movie_id=MovieContract.MovieEntry.getMovieID(uri);
         Log.d("hello","return the cursor with the movie");
         return sqLiteQueryBuilderForMovie.query(movieDbHelper.getReadableDatabase(),
                 projection,
                 queryMovieById,
-                new String[]{movie_id},
+                new String[]{Integer.toString(movie_id)},
                 null,
                 null,
                 sortOrder
@@ -116,12 +108,12 @@ public class MovieProvider extends ContentProvider{
     }
 
     private Cursor getFavouriteById(Uri uri,String[] projection,String sortOrder){
-        String movie_id=MovieContract.Favourite.getMovieID(uri);
+        int movie_id=MovieContract.Favourite.getMovieID(uri);
         Log.d("hello", "return the cursor in the favorite table");
         return sqLiteQueryBuilderForFavourite.query(movieDbHelper.getReadableDatabase(),
                 projection,
                 queryFavouriteById,
-                new String[]{movie_id},
+                new String[]{Integer.toString(movie_id)},
                 null,
                 null,
                 sortOrder
@@ -133,16 +125,12 @@ public class MovieProvider extends ContentProvider{
         final int match=matcher.match(uri);
         switch (match){
             case MOVIE:
-                Log.d("hello",MovieContract.MovieEntry.CONTENT_TYPE);
                 return MovieContract.MovieEntry.CONTENT_TYPE;
             case MOVIE_WITH_ID:
-                Log.d("hello",MovieContract.MovieEntry.CONTENT_ITEM_TYPE);
                 return MovieContract.MovieEntry.CONTENT_ITEM_TYPE;
             case FAVOURITE:
-                Log.d("hello",MovieContract.Favourite.CONTENT_TYPE);
                 return MovieContract.Favourite.CONTENT_TYPE;
             case FAVOURITE_WITH_ID:
-                Log.d("hello",MovieContract.Favourite.CONTENT_ITEM_TYPE);
                 return MovieContract.Favourite.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -160,7 +148,6 @@ public class MovieProvider extends ContentProvider{
                 _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
                 if(_id>0) {
                     returnuri = MovieContract.MovieEntry.buildUriWithId(_id);
-                    Log.d("hello",returnuri.toString());
                 }
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
@@ -169,7 +156,6 @@ public class MovieProvider extends ContentProvider{
                 _id=db.insert(MovieContract.Favourite.TABLE_NAME,null,values);
                 if(_id>0) {
                     returnuri = MovieContract.Favourite.buildUriWithId(_id);
-                    Log.d("hello",returnuri.toString());
                 }
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
@@ -242,16 +228,13 @@ public class MovieProvider extends ContentProvider{
 
         final SQLiteDatabase db = movieDbHelper.getWritableDatabase();
         final int match = matcher.match(uri);
-        Log.d("hello","match in bulk insert :" + match);
         switch (match) {
             case MOVIE: {
                 db.beginTransaction();
                 int retCount = 0;
-                Log.d("hello","I m in contract in movie bulk insert");
                 try {
                     for (ContentValues value : values) {
                         long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, value);
-                        Log.d("hello","my id is"+_id);
                         if (_id != -1) {
                             retCount++;
                         }

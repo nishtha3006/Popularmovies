@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.nishtha.popular_movie.Data.MovieContract;
 import com.example.nishtha.popular_movie.Data.MovieContract.MovieEntry;
 
 import org.json.JSONArray;
@@ -33,58 +34,52 @@ public class FetchMovies extends AsyncTask<String,Void,Void> {
     @Override
     protected Void doInBackground(String... params) {
         try{
-        final String baseUrl = "http://api.themoviedb.org/3/discover/movie?";
-        final String SORT_PARAM = "sort_by";
-        final String API_KEY = "api_key";
-
-        Uri queryUri = Uri.parse(baseUrl).buildUpon()
-                .appendQueryParameter(SORT_PARAM, params[0])
-                .appendQueryParameter(API_KEY,"d22374f30dea5711f5ae946bed7189f6")
-                .build();
-
-        URL url = new URL(queryUri.toString());
-        Log.v(LOG_TAG, "THE URL IS: " + url);
+            final String BASE_URL="http://api.themoviedb.org/3/discover/movie";
+            final String SORT_BY="sort_by";
+            final String API_KEY="api_key";
+            Uri uri=Uri.parse(BASE_URL).buildUpon().appendQueryParameter(SORT_BY,params[0]+".desc").
+                    appendQueryParameter(API_KEY, "d22374f30dea5711f5ae946bed7189f6").build();
+            URL url = new URL(uri.toString());
+            Log.v(LOG_TAG, "THE URL IS: " + url);
 
         // Create the request to OpenWeatherMap, and open the connection
-        urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setRequestMethod("GET");
-        urlConnection.connect();
-        Log.d("hello","connected");
-        // Read the input stream into a String
-        InputStream inputStream = urlConnection.getInputStream();
-        StringBuffer buffer = new StringBuffer();
-        if (inputStream == null) {
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+            // Read the input stream into a String
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuffer buffer = new StringBuffer();
+            if (inputStream == null) {
 
-        }
-        reader = new BufferedReader(new InputStreamReader(inputStream));
-
-        String line;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line + "\n");
-        }
-
-        if (buffer.length() == 0) {
-
-        }
-        moviesJsonStr = buffer.toString();
-            Log.v("Result", moviesJsonStr);
-        getMovieData(moviesJsonStr);
-
-    }catch(Exception e){
-            Log.e(LOG_TAG,e.getMessage());
-        }finally {
-            if(urlConnection!=null){
-                urlConnection.disconnect();
             }
-            try{
-                if(reader!=null){
-                    reader.close();
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line + "\n");
+            }
+
+            if (buffer.length() == 0) {
+
+            }
+            moviesJsonStr = buffer.toString();
+            getMovieData(moviesJsonStr);
+
+        }catch(Exception e){
+                Log.e(LOG_TAG,e.getMessage());
+            }finally {
+                if(urlConnection!=null){
+                    urlConnection.disconnect();
                 }
-            }catch (Exception e){
-                Log.e(LOG_TAG,"reader didnt close properly");
+                try{
+                    if(reader!=null){
+                        reader.close();
+                    }
+                }catch (Exception e){
+                    Log.e(LOG_TAG,"reader didnt close properly");
+                }
             }
-        }
-        return null;
+            return null;
     }
     private void getMovieData(String movies_detail) {
         final String RESULTS = "results";
@@ -98,8 +93,8 @@ public class FetchMovies extends AsyncTask<String,Void,Void> {
         JSONObject movie_json = new JSONObject(movies_detail);
         JSONArray movieArray=movie_json.getJSONArray(RESULTS);
             Vector<ContentValues> cVector=new Vector<>(movieArray.length());
-            //int deleted = mcontex.getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, null, null);
-            Log.d(LOG_TAG, "Previous data wiping Complete. "  + " Deleted");
+            int deleted = mcontex.getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, null, null);
+            Log.d(LOG_TAG, "Previous data wiping Complete. " +deleted+ " Deleted");
             for(int i=0;i<movieArray.length();i++){
                 JSONObject movieObject=movieArray.getJSONObject(i);
                 ContentValues value=new ContentValues();
@@ -110,16 +105,14 @@ public class FetchMovies extends AsyncTask<String,Void,Void> {
                 String over_view=movieObject.getString(OVER_VIEW);
                 value.put(MovieEntry.COLUMN_OVERVIEW, over_view);
                 String final_url="http://image.tmdb.org/t/p/w342/"+movieObject.getString(POSTER_PATH);
-                Log.d("hello",final_url);
                 value.put(MovieEntry.COLUMN_IMAGE_PATH, final_url);
                 String release_date=movieObject.getString(RELEASE_DATE);
                 value.put(MovieEntry.COLUMN_RELEASE_DATE,release_date);
                 double ratings=movieObject.getDouble(RATINGS);
-                value.put(MovieEntry.COLUMN_RATINGS,ratings);
+                value.put(MovieEntry.COLUMN_RATINGS,Double.toString(ratings));
                 cVector.add(value);
-               // mcontex.getContentResolver().insert(MovieEntry.CONTENT_URI,value);
             }
-            int inserted=0;
+            int inserted;
             ContentValues[] values=new ContentValues[cVector.size()];
             cVector.toArray(values);
             inserted=mcontex.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI,values);

@@ -24,7 +24,7 @@ public class MovieContract {
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
         public static final String TABLE_NAME = "movie";
         public static final String COLUMN_TITLE = "original_title";
-        public static final String COLUMN_ID = "id";
+        public static final String COLUMN_ID = "movie_id";
         public static final String COLUMN_OVERVIEW = "overview";
         public static final String COLUMN_IMAGE_PATH = "poster_path";
         public static final String COLUMN_RELEASE_DATE = "release_date";
@@ -35,9 +35,9 @@ public class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI,id);
         }
 
-        public static String getMovieID(Uri uri){
+        public static int getMovieID(Uri uri){
             Log.d("hello",uri.getPathSegments().get(1)+"id");
-            return uri.getPathSegments().get(1);
+            return Integer.parseInt(uri.getPathSegments().get(1));
         }
     }
 
@@ -60,8 +60,8 @@ public class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI,id);
         }
 
-        public static String getMovieID(Uri uri){
-            return uri.getPathSegments().get(1);
+        public static int getMovieID(Uri uri){
+            return Integer.parseInt(uri.getPathSegments().get(1));
         }
     }
 }

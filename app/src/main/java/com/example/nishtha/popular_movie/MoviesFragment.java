@@ -1,6 +1,7 @@
 package com.example.nishtha.popular_movie;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,13 +9,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -54,14 +55,12 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         sort_type="popularity";
         mcontext=getContext();
         fav=false;
-        Log.d("hello","i am in the constructor of the moviesfragment");
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        Log.d("hello","ho gaya");
     }
 
     @Override
@@ -72,13 +71,10 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
 
     private void updateMovie(String sort_type){
         fav=false;
-        Log.d("hello","update gets called");
         if(true) {
             FetchMovies populateMovie = new FetchMovies(getContext());
-            Log.d("hello",sort_type);
             populateMovie.execute(sort_type);
-            //getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
-            Log.d("hello","loader has loaded");
+            getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
         }else {
             Toast.makeText(getContext(),"Connection failed",Toast.LENGTH_LONG).show();
         }
@@ -111,11 +107,19 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("hello","on create view");
         madapter=new GridAdapter(getActivity(),null,0);
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         GridView gridView = (GridView) rootView.findViewById(R.id.grids);
         gridView.setAdapter(madapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor=(Cursor)parent.getItemAtPosition(position);
+                Intent intent=new Intent(getContext(),Movie_Detail.class);
+                intent.putExtra("movie",new Movie(cursor));
+                startActivity(intent);
+            }
+        });
         return  rootView;
     }
 
@@ -127,7 +131,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Loader<Cursor> loader=null;
+        Loader<Cursor> loader;
         Uri content_uri;
         if(fav){
             content_uri=MovieContract.Favourite.CONTENT_URI;

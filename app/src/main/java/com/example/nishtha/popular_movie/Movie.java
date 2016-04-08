@@ -1,5 +1,6 @@
 package com.example.nishtha.popular_movie;
 
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -11,9 +12,18 @@ public class Movie implements Parcelable {
     public String image_url;
     final String BASE_URL="http://image.tmdb.org/t/p/w342/";
     double ratings;
+    int id;
     String final_url;
     Movie(){
 
+    }
+    Movie(Cursor cursor){
+        this.title=cursor.getString(MoviesFragment.MOVIE_TITLE);
+        this.id=cursor.getInt(MoviesFragment.MOVIE_ID);
+        this.overview=cursor.getString(MoviesFragment.MOVIE_OVERVIEW);
+        this.release_date=cursor.getString(MoviesFragment.MOVIE_RELEASE);
+        this.final_url=cursor.getString(MoviesFragment.MOVIE_PATH);
+        this.ratings=Double.parseDouble(cursor.getString(MoviesFragment.MOVIE_RATINGS));
     }
     Movie(Parcel in){
         String[] data=new String[4];

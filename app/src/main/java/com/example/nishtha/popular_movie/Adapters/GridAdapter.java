@@ -2,7 +2,6 @@ package com.example.nishtha.popular_movie.Adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +31,6 @@ public class GridAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         String url=cursor.getString(MoviesFragment.MOVIE_PATH);
         ImageView image=(ImageView)view.findViewById(R.id.image1);
-        Log.d("hello",url);
         Picasso.with(context).load(url).into(image);
     }
 }
