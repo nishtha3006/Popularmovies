@@ -33,6 +33,7 @@ public class Movie implements Parcelable {
         this.final_url=data[2];
         this.release_date=data[3];
         this.ratings=in.readDouble();
+        this.id=in.readInt();
     }
     @Override
     public void writeToParcel(Parcel dest, int flags) {
@@ -40,6 +41,7 @@ public class Movie implements Parcelable {
                 this.title,this.overview,this.final_url,this.release_date
         });
         dest.writeDouble(new Double(this.ratings));
+        dest.writeInt(new Integer(this.id));
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -98,5 +100,11 @@ public class Movie implements Parcelable {
         return 0;
     }
 
+    public int getId() {
+        return id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
 }

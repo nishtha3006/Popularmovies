@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.example.nishtha.popular_movie.Adapters.GridAdapter;
 import com.example.nishtha.popular_movie.Data.MovieContract;
+import com.example.nishtha.popular_movie.Query.FetchMovies;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -33,7 +34,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
     Context mcontext;
     boolean fav;
     int position= ListView.INVALID_POSITION;
-    String[] projection=new String[]{
+    String[] projection_movie=new String[]{
             MovieContract.MovieEntry.TABLE_NAME+"."+ MovieContract.MovieEntry._ID,
             MovieContract.MovieEntry.COLUMN_ID,
             MovieContract.MovieEntry.COLUMN_TITLE,
@@ -41,6 +42,15 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
             MovieContract.MovieEntry.COLUMN_RATINGS,
             MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
             MovieContract.MovieEntry.COLUMN_IMAGE_PATH
+    };
+    String[] projection_fav=new String[]{
+            MovieContract.Favourite.TABLE_NAME+"."+ MovieContract.Favourite._ID,
+            MovieContract.Favourite.COLUMN_ID,
+            MovieContract.Favourite.COLUMN_TITLE,
+            MovieContract.Favourite.COLUMN_OVERVIEW,
+            MovieContract.Favourite.COLUMN_RATINGS,
+            MovieContract.Favourite.COLUMN_RELEASE_DATE,
+            MovieContract.Favourite.COLUMN_IMAGE_PATH
     };
 
     public static final int _ID=0;
@@ -50,6 +60,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
     public static final int MOVIE_RATINGS=4;
     public static final int MOVIE_RELEASE=5;
     public static final int MOVIE_PATH=6;
+    int no_fav_movie=0;
 
     public MoviesFragment(){
         sort_type="popularity";
@@ -66,12 +77,17 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onStart() {
         super.onStart();
-        updateMovie(sort_type);
+        no_fav_movie=getContext().getContentResolver()
+                .query(MovieContract.Favourite.CONTENT_URI,null,null,null,null).getCount();
+        if(fav && no_fav_movie==0){
+            Toast.makeText(getContext(),"Favorite list is empty",Toast.LENGTH_LONG).show();
+            updateMovie(sort_type);
+        }
     }
 
     private void updateMovie(String sort_type){
         fav=false;
-        if(true) {
+        if(Utility.isNetworkAvailable(getContext(),getActivity())) {
             FetchMovies populateMovie = new FetchMovies(getContext());
             populateMovie.execute(sort_type);
             getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
@@ -99,11 +115,19 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         }
         if(item.getItemId()==R.id.fav){
             fav=true;
-            //getLoaderManager().restartLoader(MOVIE_LOADER,null,this);
+            loadFavouriteMovie();
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void loadFavouriteMovie(){
+        no_fav_movie=getContext().getContentResolver()
+                .query(MovieContract.Favourite.CONTENT_URI,null,null,null,null).getCount();
+        if(no_fav_movie==0){
+            Toast.makeText(getContext(),"Favorite list is empty",Toast.LENGTH_LONG).show();
+        }else
+            getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -115,7 +139,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor=(Cursor)parent.getItemAtPosition(position);
-                Intent intent=new Intent(getContext(),Movie_Detail.class);
+                Intent intent=new Intent(getContext(),Detail_Movie.class);
                 intent.putExtra("movie",new Movie(cursor));
                 startActivity(intent);
             }
@@ -134,11 +158,15 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         Loader<Cursor> loader;
         Uri content_uri;
         if(fav){
-            content_uri=MovieContract.Favourite.CONTENT_URI;
-            loader=new CursorLoader(getActivity(),content_uri,projection,null,null,null);
+            loader = new CursorLoader(getActivity(),
+                    MovieContract.Favourite.CONTENT_URI,
+                    projection_fav,
+                    null,
+                    null,
+                    null);
         }else{
             content_uri=MovieContract.MovieEntry.CONTENT_URI;
-            loader=new CursorLoader(getActivity(),content_uri,projection,null,null,null);
+            loader=new CursorLoader(getActivity(),content_uri,projection_movie,null,null,null);
         }
         return loader;
     }

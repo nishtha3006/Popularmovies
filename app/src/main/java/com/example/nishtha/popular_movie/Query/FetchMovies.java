@@ -1,4 +1,4 @@
-package com.example.nishtha.popular_movie;
+package com.example.nishtha.popular_movie.Query;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -28,7 +28,7 @@ public class FetchMovies extends AsyncTask<String,Void,Void> {
     BufferedReader reader;
     String moviesJsonStr;
     Context mcontex;
-    FetchMovies(Context context){
+    public FetchMovies(Context context){
         mcontex=context;
     }
     @Override
@@ -63,6 +63,7 @@ public class FetchMovies extends AsyncTask<String,Void,Void> {
 
             }
             moviesJsonStr = buffer.toString();
+            Log.d("hello",moviesJsonStr);
             getMovieData(moviesJsonStr);
 
         }catch(Exception e){
@@ -95,6 +96,8 @@ public class FetchMovies extends AsyncTask<String,Void,Void> {
             Vector<ContentValues> cVector=new Vector<>(movieArray.length());
             int deleted = mcontex.getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, null, null);
             Log.d(LOG_TAG, "Previous data wiping Complete. " +deleted+ " Deleted");
+          //  deleted=mcontex.getContentResolver().delete(MovieContract.Favourite.CONTENT_URI,null,null);
+            Log.d("hello","delete all the data from the favoirite table " +deleted);
             for(int i=0;i<movieArray.length();i++){
                 JSONObject movieObject=movieArray.getJSONObject(i);
                 ContentValues value=new ContentValues();

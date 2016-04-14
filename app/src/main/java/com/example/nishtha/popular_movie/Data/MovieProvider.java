@@ -69,6 +69,7 @@ public class MovieProvider extends ContentProvider{
                 );
                 break;
             case FAVOURITE :
+                Log.d("hello",MovieContract.Favourite.TABLE_NAME+" in table");
                 retCursor = movieDbHelper.getReadableDatabase().query(
                         MovieContract.Favourite.TABLE_NAME,
                         projection,
@@ -76,8 +77,12 @@ public class MovieProvider extends ContentProvider{
                         selectionArgs,
                         null,
                         null,
-                        sortOrder
+                        null
                 );
+                Log.d("hello","i returned");
+                if(retCursor==null){
+                    Log.d("hello"," return non-null cursor from the favourite table");
+                }
                 break;
             case MOVIE_WITH_ID : {
                 retCursor=getMovieWithId(uri,projection,sortOrder);
@@ -91,6 +96,7 @@ public class MovieProvider extends ContentProvider{
                 throw new UnsupportedOperationException("unknown uri");
         }
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        Log.d("hello","notified "+uri.toString());
         return retCursor;
     }
 
@@ -129,6 +135,7 @@ public class MovieProvider extends ContentProvider{
             case MOVIE_WITH_ID:
                 return MovieContract.MovieEntry.CONTENT_ITEM_TYPE;
             case FAVOURITE:
+                Log.d("hello",MovieContract.Favourite.CONTENT_TYPE+" cursor's type");
                 return MovieContract.Favourite.CONTENT_TYPE;
             case FAVOURITE_WITH_ID:
                 return MovieContract.Favourite.CONTENT_ITEM_TYPE;
@@ -141,6 +148,7 @@ public class MovieProvider extends ContentProvider{
     public Uri insert(Uri uri, ContentValues values) {
         SQLiteDatabase db=movieDbHelper.getWritableDatabase();
         final int match=matcher.match(uri);
+        Log.d("hello","match in insert is"+match);
         Uri returnuri;
         long _id;
         switch (match){
@@ -148,6 +156,7 @@ public class MovieProvider extends ContentProvider{
                 _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
                 if(_id>0) {
                     returnuri = MovieContract.MovieEntry.buildUriWithId(_id);
+                    Log.d("hello",_id+" in insert");
                 }
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
@@ -156,6 +165,7 @@ public class MovieProvider extends ContentProvider{
                 _id=db.insert(MovieContract.Favourite.TABLE_NAME,null,values);
                 if(_id>0) {
                     returnuri = MovieContract.Favourite.buildUriWithId(_id);
+                    Log.d("hello",_id+" in insert");
                 }
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
@@ -171,6 +181,7 @@ public class MovieProvider extends ContentProvider{
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db=movieDbHelper.getWritableDatabase();
         final int match=matcher.match(uri);
+        Log.d("hello","match in delete is "+match);
         int rowsDeleted;
         if(selection==null){
             selection="1";
@@ -188,8 +199,9 @@ public class MovieProvider extends ContentProvider{
                 rowsDeleted=db.delete(MovieContract.Favourite.TABLE_NAME, selection, selectionArgs);
                 break;
             case FAVOURITE_WITH_ID:
+                Log.d("hello",String.valueOf(ContentUris.parseId(uri)) + "deleted movie's id");
                 rowsDeleted=db.delete(MovieContract.Favourite.TABLE_NAME,
-                        MovieContract.MovieEntry.COLUMN_ID + "=?",
+                        MovieContract.Favourite.COLUMN_ID + "=?",
                         new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             default:
@@ -215,6 +227,7 @@ public class MovieProvider extends ContentProvider{
                 break;
             case FAVOURITE :
                 rowsUpdated=db.update(MovieContract.Favourite.TABLE_NAME, values, selection, selectionArgs);
+                break;
             default:
                 throw new UnsupportedOperationException("unknown uri");
         }
