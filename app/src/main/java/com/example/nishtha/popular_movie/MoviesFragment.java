@@ -1,7 +1,6 @@
 package com.example.nishtha.popular_movie;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -74,6 +73,13 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         setHasOptionsMenu(true);
     }
 
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(Movie movie);
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -98,7 +104,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.movie_fragment,menu);
+        inflater.inflate(R.menu.movie_type,menu);
     }
 
     @Override
@@ -139,9 +145,12 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor=(Cursor)parent.getItemAtPosition(position);
-                Intent intent=new Intent(getContext(),Detail_Movie.class);
-                intent.putExtra("movie",new Movie(cursor));
-                startActivity(intent);
+                Movie movie=new Movie(cursor);
+                if (cursor != null) {
+                    ((Callback) getActivity())
+                            .onItemSelected(movie);
+                }
+
             }
         });
         return  rootView;

@@ -1,23 +1,26 @@
 package com.example.nishtha.popular_movie;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MoviesFragment.Callback {
 
+    boolean mTwoPane;
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.main_layout, new MoviesFragment())
-                    .commit();}
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        if (findViewById(R.id.movie_detail_container) != null) {
+            mTwoPane = true;
+        } else {
+            mTwoPane = false;
+        }
     }
 
     @Override
@@ -27,12 +30,23 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        return super.onOptionsItemSelected(item);
+    public void onItemSelected(Movie movie) {
+        if(!mTwoPane){
+            Intent intent=new Intent(this,Detail_Movie.class);
+            intent.putExtra("movie",movie);
+            startActivity(intent);
+        }else{
+            Bundle arguments = new Bundle();
+            arguments.putParcelable("movie", movie);
+
+            Detail_MovieFragment fragment = new Detail_MovieFragment();
+            fragment.setArguments(arguments);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.movie_detail_container, fragment, DETAILFRAGMENT_TAG)
+                    .commit();
+        }
     }
 }
