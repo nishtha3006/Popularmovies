@@ -3,7 +3,6 @@ package com.example.nishtha.popular_movie.Data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 /**
  * Created by nishtha on 4/4/16.
@@ -46,7 +45,6 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.d("hello","onupgrade");
         db.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS "+MovieContract.Favourite.TABLE_NAME);
         onCreate(db);

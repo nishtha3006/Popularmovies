@@ -79,10 +79,6 @@ public class MovieProvider extends ContentProvider{
                         null,
                         null
                 );
-                Log.d("hello","i returned");
-                if(retCursor==null){
-                    Log.d("hello"," return non-null cursor from the favourite table");
-                }
                 break;
             case MOVIE_WITH_ID : {
                 retCursor=getMovieWithId(uri,projection,sortOrder);
@@ -102,7 +98,6 @@ public class MovieProvider extends ContentProvider{
 
     private Cursor getMovieWithId(Uri uri,String[] projection,String sortOrder){
         int movie_id=MovieContract.MovieEntry.getMovieID(uri);
-        Log.d("hello","return the cursor with the movie");
         return sqLiteQueryBuilderForMovie.query(movieDbHelper.getReadableDatabase(),
                 projection,
                 queryMovieById,
@@ -115,7 +110,6 @@ public class MovieProvider extends ContentProvider{
 
     private Cursor getFavouriteById(Uri uri,String[] projection,String sortOrder){
         int movie_id=MovieContract.Favourite.getMovieID(uri);
-        Log.d("hello", "return the cursor in the favorite table");
         return sqLiteQueryBuilderForFavourite.query(movieDbHelper.getReadableDatabase(),
                 projection,
                 queryFavouriteById,
@@ -135,7 +129,6 @@ public class MovieProvider extends ContentProvider{
             case MOVIE_WITH_ID:
                 return MovieContract.MovieEntry.CONTENT_ITEM_TYPE;
             case FAVOURITE:
-                Log.d("hello",MovieContract.Favourite.CONTENT_TYPE+" cursor's type");
                 return MovieContract.Favourite.CONTENT_TYPE;
             case FAVOURITE_WITH_ID:
                 return MovieContract.Favourite.CONTENT_ITEM_TYPE;
@@ -148,7 +141,6 @@ public class MovieProvider extends ContentProvider{
     public Uri insert(Uri uri, ContentValues values) {
         SQLiteDatabase db=movieDbHelper.getWritableDatabase();
         final int match=matcher.match(uri);
-        Log.d("hello","match in insert is"+match);
         Uri returnuri;
         long _id;
         switch (match){
@@ -181,7 +173,6 @@ public class MovieProvider extends ContentProvider{
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase db=movieDbHelper.getWritableDatabase();
         final int match=matcher.match(uri);
-        Log.d("hello","match in delete is "+match);
         int rowsDeleted;
         if(selection==null){
             selection="1";

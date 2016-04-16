@@ -83,8 +83,10 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         super.onStart();
         no_fav_movie=getContext().getContentResolver()
                 .query(MovieContract.Favourite.CONTENT_URI,null,null,null,null).getCount();
-        if(fav && no_fav_movie==0){
+        if((fav && no_fav_movie==0)){
             Toast.makeText(getContext(),"Favorite list is empty",Toast.LENGTH_LONG).show();
+            updateMovie(sort_type);
+        }else if(!fav){
             updateMovie(sort_type);
         }
     }
