@@ -8,8 +8,7 @@ import android.view.Menu;
 
 public class MainActivity extends AppCompatActivity implements MoviesFragment.Callback {
 
-    boolean mTwoPane;
-    private static final String DETAILFRAGMENT_TAG = "DFTAG";
+    boolean tablet;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -17,9 +16,9 @@ public class MainActivity extends AppCompatActivity implements MoviesFragment.Ca
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (findViewById(R.id.movie_detail_container) != null) {
-            mTwoPane = true;
+            tablet = true;
         } else {
-            mTwoPane = false;
+            tablet = false;
         }
     }
 
@@ -33,19 +32,17 @@ public class MainActivity extends AppCompatActivity implements MoviesFragment.Ca
 
     @Override
     public void onItemSelected(Movie movie) {
-        if(!mTwoPane){
+        if(!tablet){
             Intent intent=new Intent(this,Detail_Movie.class);
             intent.putExtra("movie",movie);
             startActivity(intent);
         }else{
             Bundle arguments = new Bundle();
             arguments.putParcelable("movie", movie);
-
             Detail_MovieFragment fragment = new Detail_MovieFragment();
             fragment.setArguments(arguments);
-
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.movie_detail_container, fragment, DETAILFRAGMENT_TAG)
+                    .replace(R.id.movie_detail_container, fragment)
                     .commit();
         }
     }

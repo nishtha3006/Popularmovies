@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.nishtha.popular_movie.Adapters.GridAdapter;
@@ -32,7 +31,6 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
     final int MOVIE_LOADER=0;
     Context mcontext;
     boolean fav;
-    int position= ListView.INVALID_POSITION;
     String[] projection_movie=new String[]{
             MovieContract.MovieEntry.TABLE_NAME+"."+ MovieContract.MovieEntry._ID,
             MovieContract.MovieEntry.COLUMN_ID,
@@ -77,7 +75,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onItemSelected(Movie movie);
+         void onItemSelected(Movie movie);
     }
 
     @Override

@@ -40,7 +40,7 @@ public class FetchMovies extends AsyncTask<String,Void,Void> {
             Uri uri=Uri.parse(BASE_URL).buildUpon().appendQueryParameter(SORT_BY,params[0]+".desc").
                     appendQueryParameter(API_KEY, "d22374f30dea5711f5ae946bed7189f6").build();
             URL url = new URL(uri.toString());
-            Log.v(LOG_TAG, "THE URL IS: " + url);
+            Log.v("hello", "THE URL IS: " + url);
 
         // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -63,7 +63,6 @@ public class FetchMovies extends AsyncTask<String,Void,Void> {
 
             }
             moviesJsonStr = buffer.toString();
-            Log.d("hello",moviesJsonStr);
             getMovieData(moviesJsonStr);
 
         }catch(Exception e){
