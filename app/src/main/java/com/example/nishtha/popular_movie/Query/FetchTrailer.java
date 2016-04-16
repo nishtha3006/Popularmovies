@@ -38,7 +38,7 @@ public class FetchTrailer extends AsyncTask<String,Void,Trailer[]> {
         Uri path=Uri.parse(base_url).buildUpon().
                 appendPath(params[0]).
                 appendPath("videos").
-                appendQueryParameter(api_key, "d22374f30dea5711f5ae946bed7189f6").
+                appendQueryParameter(api_key, "YOUR_API_KEY").
                 build();
         try{
             Log.d("hello",path.toString());
