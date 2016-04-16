@@ -38,7 +38,7 @@ public class FetchMovies extends AsyncTask<String,Void,Void> {
             final String SORT_BY="sort_by";
             final String API_KEY="api_key";
             Uri uri=Uri.parse(BASE_URL).buildUpon().appendQueryParameter(SORT_BY,params[0]+".desc").
-                    appendQueryParameter(API_KEY, "d22374f30dea5711f5ae946bed7189f6").build();
+                    appendQueryParameter(API_KEY,"YOUR_API_KEY").build();
             URL url = new URL(uri.toString());
             Log.v("hello", "THE URL IS: " + url);
 
