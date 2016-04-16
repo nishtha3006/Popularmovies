@@ -37,7 +37,7 @@ public class FetchReview extends AsyncTask<String,Void,Review[]>{
         String base_url="http://api.themoviedb.org/3/movie/" + params[0] + "/reviews";
         String api_key="api_key";
         Uri path=Uri.parse(base_url).buildUpon().
-                appendQueryParameter(api_key, "d22374f30dea5711f5ae946bed7189f6").build();
+                appendQueryParameter(api_key, "YOUR_API_KEY").build();
         //Log.d("hello","json path"+path.toString());
         try{
             URL url=new URL(path.toString());
